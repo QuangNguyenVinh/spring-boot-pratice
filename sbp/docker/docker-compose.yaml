@@ -124,6 +124,10 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --enable-feature=exemplar-storage # Enable exemplar storage feature
+      - --storage.tsdb.path=/prometheus
   tempo:
     image: grafana/tempo:2.9.0
     container_name: sbp-tempo
