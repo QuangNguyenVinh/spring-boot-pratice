@@ -1,0 +1,15 @@
+receivers:
+  otlp:
+    protocols:
+      http:           # listens on 0.0.0.0:4318
+      grpc:           # optional, 0.0.0.0:4317
+
+exporters:
+  logging:
+    verbosity: normal
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      exporters: [logging]
