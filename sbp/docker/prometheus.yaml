@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'sbp'
+    metrics_path: '/actuator/prometheus'
+    # This uses the 'host.docker.internal' DNS name for the Spring Boot app running on the host machine
+    static_configs:
+      - targets: ['host.docker.internal:8080']
+
+storage:
+  exemplars:
+    # Set the size of the in-memory circular buffer by the number of exemplars.
+    # The default is 0 (disabled).
+    max_exemplars: 1000000
+
