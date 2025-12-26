@@ -116,6 +116,7 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-otlp</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <!-- Exporter to send traces via OTLP (OpenTelemetry Protocol) -->
         <dependency>
