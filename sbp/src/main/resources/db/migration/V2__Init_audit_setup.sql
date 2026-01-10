@@ -1,8 +1,9 @@
+SET search_path TO auth;
 -- 1) Extensions
 CREATE EXTENSION IF NOT EXISTS pgcrypto; -- for digest() and crypt(), gen_random_bytes(), etc.
 
 -- 2) Shared helper: set updated_at automatically
-CREATE OR REPLACE FUNCTION app_set_updated_at()
+CREATE OR REPLACE FUNCTION auth.app_set_updated_at()
     RETURNS TRIGGER
     LANGUAGE plpgsql
 AS
@@ -14,7 +15,7 @@ END;
 $$;
 
 -- 3) Shared helper: fetch "who did it" from session settings (if present)
-CREATE OR REPLACE FUNCTION app_setting_text(key text)
+CREATE OR REPLACE FUNCTION auth.app_setting_text(key text)
     RETURNS text
     LANGUAGE sql
 AS
@@ -22,7 +23,7 @@ $$
 SELECT current_setting(key, true);
 $$;
 
-CREATE OR REPLACE FUNCTION app_setting_uuid(key text)
+CREATE OR REPLACE FUNCTION auth.app_setting_uuid(key text)
     RETURNS uuid
     LANGUAGE sql
 AS
@@ -85,7 +86,7 @@ CREATE INDEX IF NOT EXISTS idx_audit_row_request_id ON audit_row (request_id);
 --    Notes:
 --    - expects PK column named "id" (uuid) on audited tables
 --    - stores old/new snapshots as jsonb
-CREATE OR REPLACE FUNCTION app_audit_row()
+CREATE OR REPLACE FUNCTION auth.app_audit_row()
     RETURNS TRIGGER
     LANGUAGE plpgsql
 AS
@@ -98,15 +99,15 @@ DECLARE
     v_user_agent     text;
     v_row_pk         uuid;
 BEGIN
-    v_actor_user_id := app_setting_uuid('app.user_id');
-    v_actor_username := app_setting_text('app.username');
-    v_request_id := app_setting_uuid('app.request_id');
-    v_ip := NULLIF(app_setting_text('app.ip'), '')::inet;
-    v_user_agent := app_setting_text('app.user_agent');
+    v_actor_user_id := auth.app_setting_uuid('app.user_id');
+    v_actor_username := auth.app_setting_text('app.username');
+    v_request_id := auth.app_setting_uuid('app.request_id');
+    v_ip := NULLIF(auth.app_setting_text('app.ip'), '')::inet;
+    v_user_agent := auth.app_setting_text('app.user_agent');
 
     IF (TG_OP = 'INSERT') THEN
         v_row_pk := NEW.id;
-        INSERT INTO audit_row(actor_user_id, actor_username, request_id, ip, user_agent,
+        INSERT INTO auth.audit_row(actor_user_id, actor_username, request_id, ip, user_agent,
                               table_name, operation, row_pk, old_data, new_data)
         VALUES (v_actor_user_id, v_actor_username, v_request_id, v_ip, v_user_agent,
                 TG_TABLE_NAME, TG_OP, v_row_pk, NULL, to_jsonb(NEW));
@@ -114,7 +115,7 @@ BEGIN
 
     ELSIF (TG_OP = 'UPDATE') THEN
         v_row_pk := NEW.id;
-        INSERT INTO audit_row(actor_user_id, actor_username, request_id, ip, user_agent,
+        INSERT INTO auth.audit_row(actor_user_id, actor_username, request_id, ip, user_agent,
                               table_name, operation, row_pk, old_data, new_data)
         VALUES (v_actor_user_id, v_actor_username, v_request_id, v_ip, v_user_agent,
                 TG_TABLE_NAME, TG_OP, v_row_pk, to_jsonb(OLD), to_jsonb(NEW));
@@ -122,7 +123,7 @@ BEGIN
 
     ELSIF (TG_OP = 'DELETE') THEN
         v_row_pk := OLD.id;
-        INSERT INTO audit_row(actor_user_id, actor_username, request_id, ip, user_agent,
+        INSERT INTO auth.audit_row(actor_user_id, actor_username, request_id, ip, user_agent,
                               table_name, operation, row_pk, old_data, new_data)
         VALUES (v_actor_user_id, v_actor_username, v_request_id, v_ip, v_user_agent,
                 TG_TABLE_NAME, TG_OP, v_row_pk, to_jsonb(OLD), NULL);

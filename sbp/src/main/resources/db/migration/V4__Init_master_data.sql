@@ -1,3 +1,4 @@
+SET search_path TO auth;
 INSERT INTO role (name, description)
 VALUES ('ADMIN', 'System administrator'),
        ('USER', 'Standard user')

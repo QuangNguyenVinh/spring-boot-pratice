@@ -1,3 +1,4 @@
+SET search_path TO auth;
 -- USERS
 CREATE TABLE IF NOT EXISTS app_user
 (
