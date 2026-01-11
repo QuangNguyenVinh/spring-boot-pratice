@@ -3,7 +3,6 @@ package com.example.sbp.service;
 import com.example.sbp.model.AppUser;
 import com.example.sbp.model.AuthSession;
 import com.example.sbp.repository.AuthSessionRepository;
-import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

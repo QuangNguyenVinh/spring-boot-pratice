@@ -20,6 +20,7 @@ import java.util.UUID;
 public class AuditEvent {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @NotNull

@@ -8,7 +8,6 @@ import com.example.sbp.repository.RefreshTokenRepository;
 import com.example.sbp.security.component.JwtService;
 import com.example.sbp.security.component.RefreshTokenGenerator;
 import com.example.sbp.security.model.UserPrincipal;
-import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -75,9 +74,9 @@ public class TokenService {
 
     @Transactional
     public TokenDTO rotateRefresh(String refreshJwt) throws Exception {
-        Claims c = jwtService.parseAndValidate(refreshJwt).getPayload();
+        var jwt = jwtService.parseAndValidate(refreshJwt);
 
-        if (!"refresh".equals(c.get("type", String.class))) {
+        if (!"refresh".equals(jwt.getClaimAsString("type"))) {
             throw new UnauthorizedException("Not a refresh token");
         }
 
@@ -93,7 +92,7 @@ public class TokenService {
         }
 
         // Hard consistency: JWT jti must match DB row
-        UUID jti = UUID.fromString(c.getId());
+        UUID jti = UUID.fromString(jwt.getId());
         if (!old.getId().equals(jti)) {
             refreshTokenRepository.revokeSession(old.getSession().getId(), "JTI_MISMATCH");
             throw new UnauthorizedException("Token mismatch");
@@ -113,7 +112,7 @@ public class TokenService {
         // 2) Sign new refresh JWT
         String newRefresh = jwtService.issueRefreshToken(
                 old.getUser().getId(),
-                c.getSubject(),
+                jwt.getSubject(),
                 old.getSession().getId(),
                 next.getId()
         );

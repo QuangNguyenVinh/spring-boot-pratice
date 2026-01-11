@@ -2,7 +2,6 @@ package com.example.sbp.controller;
 
 import com.example.sbp.dto.TokenDTO;
 import com.example.sbp.security.model.UserPrincipal;
-import com.example.sbp.service.AppUserService;
 import com.example.sbp.service.SessionService;
 import com.example.sbp.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,20 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationController {
     private final AuthenticationManager authManager;
-    private final AppUserService appUserService;
     private final SessionService sessionService;
     private final TokenService tokenService;
 
-    public AuthenticationController(AuthenticationManager authManager, AppUserService appUserService,
+    public AuthenticationController(AuthenticationManager authManager,
                                     SessionService sessionService, TokenService tokenService) {
         this.authManager = authManager;
-        this.appUserService = appUserService;
         this.sessionService = sessionService;
         this.tokenService = tokenService;
     }
