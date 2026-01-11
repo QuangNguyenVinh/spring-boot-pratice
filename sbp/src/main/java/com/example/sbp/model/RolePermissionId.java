@@ -2,6 +2,7 @@ package com.example.sbp.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import java.io.Serial;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,8 @@ import java.util.UUID;
 @Embeddable
 public class RolePermissionId implements Serializable {
 
-    private static final long serialVersionUID = 7994952742537022337L;
+    @Serial
+	private static final long serialVersionUID = 7994952742537022337L;
 
     @Column(name = "role_id", nullable = false)
     private UUID roleId;

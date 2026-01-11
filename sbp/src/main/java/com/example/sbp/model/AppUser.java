@@ -18,6 +18,7 @@ import java.util.UUID;
 public class AppUser {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @NotNull

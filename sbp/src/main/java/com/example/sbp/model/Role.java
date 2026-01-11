@@ -19,6 +19,7 @@ import java.util.UUID;
 public class Role {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @NotNull
